@@ -1,6 +1,7 @@
 {
-  "name": "network-auth",
+  "name": "network-auth-web",
   "version": "1.0.3",
+  "description": "基于 vue-pure-admin 开发的 NetworkAuth 前端管理控制台",
   "private": true,
   "type": "module",
   "scripts": {
@@ -33,13 +34,13 @@
     "vite",
     "esm"
   ],
-  "homepage": "https://github.com/skyle1995/NetworkAuth",
+  "homepage": "https://github.com/skyle1995/NetworkAuth-Web",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/skyle1995/NetworkAuth.git"
+    "url": "git+https://github.com/skyle1995/NetworkAuth-Web.git"
   },
   "bugs": {
-    "url": "https://github.com/skyle1995/NetworkAuth/issues"
+    "url": "https://github.com/skyle1995/NetworkAuth-Web/issues"
   },
   "license": "MIT",
   "author": {
