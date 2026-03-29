@@ -14,7 +14,7 @@ export default {
     {
       path: "/admin/system/profile",
       name: "ProfileIndex",
-      component: () => import("@/views/admin/profile/index.vue"),
+      component: () => import("@/views/admin/system/profile/index.vue"),
       meta: {
         icon: "ep/user",
         title: "个人资料"
@@ -23,7 +23,7 @@ export default {
     {
       path: "/admin/system/settings",
       name: "SettingsIndex",
-      component: () => import("@/views/admin/settings/index.vue"),
+      component: () => import("@/views/admin/system/settings/index.vue"),
       meta: {
         icon: "ep/setting",
         title: "系统设置"

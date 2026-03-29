@@ -14,7 +14,7 @@ export default {
     {
       path: "/admin/apps/index",
       name: "AppsIndex",
-      component: () => import("@/views/admin/apps/index.vue"),
+      component: () => import("@/views/admin/application/apps/index.vue"),
       meta: {
         title: "应用程序",
         icon: "ep:grid",
@@ -24,7 +24,7 @@ export default {
     {
       path: "/admin/apis/index",
       name: "ApisIndex",
-      component: () => import("@/views/admin/apis/index.vue"),
+      component: () => import("@/views/admin/application/apis/index.vue"),
       meta: {
         title: "接口设置",
         icon: "ep:connection",
@@ -34,7 +34,7 @@ export default {
     {
       path: "/admin/variables/index",
       name: "VariablesIndex",
-      component: () => import("@/views/admin/variables/index.vue"),
+      component: () => import("@/views/admin/application/variables/index.vue"),
       meta: {
         title: "公共变量",
         icon: "ep:document",
@@ -44,7 +44,7 @@ export default {
     {
       path: "/admin/functions/index",
       name: "FunctionsIndex",
-      component: () => import("@/views/admin/functions/index.vue"),
+      component: () => import("@/views/admin/application/functions/index.vue"),
       meta: {
         title: "公共函数",
         icon: "ep:setting",

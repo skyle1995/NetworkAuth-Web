@@ -17,13 +17,15 @@ NetworkAuth-Web 是一款中后台管理系统模版，配套 NetworkAuth 后端
 
 - **`admin/`**：后台管理模块（需要登录授权）
   - `dashboard/`：控制台仪表盘
-  - `apps/`：应用管理模块（应用列表、各类配置等）
-  - `apis/`：API 接口管理模块
-  - `functions/`：函数代码管理模块
-  - `variables/`：变量配置管理模块
+  - `application/`：应用相关模块分组
+    - `apps/`：应用管理模块（应用列表、各类配置等）
+    - `apis/`：API 接口管理模块
+    - `functions/`：函数代码管理模块
+    - `variables/`：变量配置管理模块
+  - `system/`：系统相关模块分组
+    - `settings/`：系统基础设置
+    - `profile/`：个人中心
   - `logs/`：系统日志（包含登录日志、操作日志等）
-  - `settings/`：系统基础设置
-  - `profile/`：个人中心
   - `login/`：后台登录页面
 - **`home/`**：前台首页（面向普通用户的展示页）
 - **`install/`**：系统安装向导（初次部署时的配置指引）
