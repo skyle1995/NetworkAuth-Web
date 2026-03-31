@@ -242,6 +242,8 @@ onUnmounted(() => {
             v-loading="loading"
             :data="loginLogs"
             style="width: 100%"
+            table-layout="auto"
+            show-overflow-tooltip
             border
           >
             <el-table-column prop="created_at" label="登录时间" width="180">

@@ -446,7 +446,8 @@ async function openRegisterConfigDialog(uuid: string) {
         <pure-table
           ref="tableRef"
           row-key="id"
-          table-layout="fixed"
+          table-layout="auto"
+          show-overflow-tooltip
           border
           :loading="loading"
           :size="size"

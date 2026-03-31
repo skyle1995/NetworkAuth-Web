@@ -34,7 +34,7 @@ export function useRole() {
     {
       label: "用户名",
       prop: "username",
-      width: 150
+      width: 180
     },
     {
       label: "登录 IP",
@@ -58,7 +58,7 @@ export function useRole() {
     {
       label: "登录信息",
       prop: "message",
-      width: 150
+      width: 200
     },
     {
       label: "浏览器类型",
