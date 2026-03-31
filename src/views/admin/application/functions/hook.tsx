@@ -18,12 +18,12 @@ export function useFunction() {
     search: "",
     app_uuid: ""
   });
-  
+
   const formRef = ref();
   const dataList = ref([]);
   const loading = ref(true);
   const apps = ref([]);
-  
+
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
@@ -103,7 +103,7 @@ export function useFunction() {
         search: form.search,
         app_uuid: form.app_uuid
       });
-      
+
       if (code === 0) {
         dataList.value = data || [];
         pagination.total = count || 0;
@@ -190,7 +190,7 @@ export function useFunction() {
                 } else {
                   res = await createFunction(curData);
                 }
-                
+
                 if (res.code === 0) {
                   message("保存成功", { type: "success" });
                   options.visible = false;
@@ -219,7 +219,7 @@ export function useFunction() {
           dangerouslyUseHTMLString: true
         }
       );
-      const { code, msg } = await deleteFunction({ uuid: row.uuid });
+      const { code, msg } = await deleteFunction({ id: row.id });
       if (code === 0) {
         message("删除成功", { type: "success" });
         onSearch();

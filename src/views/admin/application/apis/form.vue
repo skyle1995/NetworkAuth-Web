@@ -110,10 +110,7 @@ defineExpose({ getRef });
       </el-col>
     </el-row>
 
-    <el-row
-      v-if="newFormInline.submit_algorithm === 2"
-      class="mt-4"
-    >
+    <el-row v-if="newFormInline.submit_algorithm === 2" class="mt-4">
       <el-col :span="24">
         <el-form-item label="公钥" prop="submit_public_key">
           <el-input
@@ -136,10 +133,7 @@ defineExpose({ getRef });
       </el-col>
     </el-row>
 
-    <el-row
-      v-if="newFormInline.submit_algorithm === 1"
-      class="mt-4"
-    >
+    <el-row v-if="newFormInline.submit_algorithm === 1" class="mt-4">
       <el-col :span="24">
         <el-form-item label="RC4 密钥" prop="submit_private_key">
           <el-input
@@ -150,10 +144,7 @@ defineExpose({ getRef });
       </el-col>
     </el-row>
 
-    <el-row
-      v-if="newFormInline.submit_algorithm === 4"
-      class="mt-4"
-    >
+    <el-row v-if="newFormInline.submit_algorithm === 4" class="mt-4">
       <el-col :span="24">
         <el-form-item label="易加密密钥" prop="submit_private_key">
           <el-input
@@ -185,10 +176,7 @@ defineExpose({ getRef });
       </el-col>
     </el-row>
 
-    <el-row
-      v-if="newFormInline.return_algorithm === 2"
-      class="mt-4"
-    >
+    <el-row v-if="newFormInline.return_algorithm === 2" class="mt-4">
       <el-col :span="24">
         <el-form-item label="公钥" prop="return_public_key">
           <el-input
@@ -211,10 +199,7 @@ defineExpose({ getRef });
       </el-col>
     </el-row>
 
-    <el-row
-      v-if="newFormInline.return_algorithm === 1"
-      class="mt-4"
-    >
+    <el-row v-if="newFormInline.return_algorithm === 1" class="mt-4">
       <el-col :span="24">
         <el-form-item label="RC4 密钥" prop="return_private_key">
           <el-input
@@ -225,10 +210,7 @@ defineExpose({ getRef });
       </el-col>
     </el-row>
 
-    <el-row
-      v-if="newFormInline.return_algorithm === 4"
-      class="mt-4"
-    >
+    <el-row v-if="newFormInline.return_algorithm === 4" class="mt-4">
       <el-col :span="24">
         <el-form-item label="易加密密钥" prop="return_private_key">
           <el-input
@@ -238,6 +220,5 @@ defineExpose({ getRef });
         </el-form-item>
       </el-col>
     </el-row>
-
   </el-form>
 </template>

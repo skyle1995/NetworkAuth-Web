@@ -1,6 +1,12 @@
 import dayjs from "dayjs";
 import { message } from "@/utils/message";
-import { getApiList, updateApi, updateApiStatus, getApiTypes, generateApiKeys } from "@/api/admin/api";
+import {
+  getApiList,
+  updateApi,
+  updateApiStatus,
+  getApiTypes,
+  generateApiKeys
+} from "@/api/admin/api";
 import { getAppsList } from "@/api/admin/app";
 import type { PaginationProps } from "@pureadmin/table";
 import { reactive, ref, onMounted, toRaw, h } from "vue";
@@ -13,7 +19,7 @@ export function useApi() {
     app_uuid: "",
     api_type: ""
   });
-  
+
   const dataList = ref([]);
   const appList = ref([]);
   const apiTypes = ref([]);
@@ -88,7 +94,9 @@ export function useApi() {
     try {
       const { code, msg } = await updateApiStatus({ id: row.id, status: val });
       if (code === 0) {
-        message(`已${val === 1 ? "启用" : "禁用"}接口配置`, { type: "success" });
+        message(`已${val === 1 ? "启用" : "禁用"}接口配置`, {
+          type: "success"
+        });
       } else {
         row.status = val === 1 ? 0 : 1;
         message(msg || "操作失败", { type: "error" });
@@ -116,9 +124,9 @@ export function useApi() {
       page: pagination.currentPage,
       limit: pagination.pageSize
     };
-    
+
     try {
-      const { data, code, count } = await getApiList(params) as any;
+      const { data, code, count } = (await getApiList(params)) as any;
       if (code === 0) {
         dataList.value = data || [];
         pagination.total = count || 0;
@@ -132,7 +140,10 @@ export function useApi() {
 
   async function fetchApps() {
     try {
-      const { data, code } = await getAppsList({ page: 1, limit: 1000 }) as any;
+      const { data, code } = (await getAppsList({
+        page: 1,
+        limit: 1000
+      })) as any;
       if (code === 0) {
         appList.value = data || [];
       }
@@ -143,7 +154,7 @@ export function useApi() {
 
   async function fetchApiTypes() {
     try {
-      const { data, code } = await getApiTypes() as any;
+      const { data, code } = (await getApiTypes()) as any;
       if (code === 0 && Array.isArray(data)) {
         apiTypes.value = data.map((item: any) => ({
           value: item.value,
@@ -218,7 +229,7 @@ export function useApi() {
           btnClick: async ({ dialog: { options } }) => {
             const curData = options.props.formInline as any;
             let successCount = 0;
-            
+
             // 提交数据加密生成
             if (curData.submit_algorithm > 0) {
               try {
@@ -233,7 +244,7 @@ export function useApi() {
                 }
               } catch (e) {}
             }
-            
+
             // 返回数据加密生成
             if (curData.return_algorithm > 0) {
               try {
@@ -248,10 +259,13 @@ export function useApi() {
                 }
               } catch (e) {}
             }
-            
+
             if (successCount > 0) {
               message("密钥生成成功", { type: "success" });
-            } else if (curData.submit_algorithm === 0 && curData.return_algorithm === 0) {
+            } else if (
+              curData.submit_algorithm === 0 &&
+              curData.return_algorithm === 0
+            ) {
               message("当前均为不加密算法，无需生成密钥", { type: "info" });
             }
           }

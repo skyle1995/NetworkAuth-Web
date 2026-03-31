@@ -24,5 +24,7 @@ export const deleteFunction = (data?: object) => {
 };
 
 export const batchDeleteFunctions = (data?: object) => {
-  return http.request<Result>("post", "/api/admin/function/batch_delete", { data });
+  return http.request<Result>("post", "/api/admin/function/batch_delete", {
+    data
+  });
 };

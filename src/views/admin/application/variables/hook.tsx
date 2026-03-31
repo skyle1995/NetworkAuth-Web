@@ -18,12 +18,12 @@ export function useVariable() {
     search: "",
     app_uuid: ""
   });
-  
+
   const formRef = ref();
   const dataList = ref([]);
   const loading = ref(true);
   const apps = ref([]);
-  
+
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
@@ -103,7 +103,7 @@ export function useVariable() {
         search: form.search,
         app_uuid: form.app_uuid
       });
-      
+
       if (code === 0) {
         dataList.value = data || [];
         pagination.total = count || 0;
@@ -190,7 +190,7 @@ export function useVariable() {
                 } else {
                   res = await createVariable(curData);
                 }
-                
+
                 if (res.code === 0) {
                   message("保存成功", { type: "success" });
                   options.visible = false;

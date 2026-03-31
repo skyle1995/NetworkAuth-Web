@@ -27,7 +27,7 @@ import { addDialog } from "@/components/ReDialog";
 
 export function useApp() {
   const form = reactive({
-    search: "",
+    search: ""
   });
   const dataList = ref([]);
   const loading = ref(true);

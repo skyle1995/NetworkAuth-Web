@@ -385,7 +385,7 @@ async function openRegisterConfigDialog(uuid: string) {
       :model="form"
       class="search-form bg-bg_color w-full pl-8 pt-3 overflow-auto"
     >
-      <el-form-item label="搜索" prop="search">
+      <el-form-item label="搜索内容" prop="search">
         <el-input
           v-model="form.search"
           placeholder="应用名称/UUID"
@@ -402,17 +402,14 @@ async function openRegisterConfigDialog(uuid: string) {
         >
           查询
         </el-button>
-        <el-button
-          :icon="useRenderIcon('ep:refresh')"
-          @click="resetForm(formRef)"
-        >
+        <el-button :icon="useRenderIcon('ep:refresh')" @click="resetForm(formRef)">
           重置
         </el-button>
       </el-form-item>
     </el-form>
 
-    <PureTableBar title="应用列表" :columns="columns" @refresh="onSearch">
-      <template #buttons>
+    <el-card shadow="never" class="table-wrapper mt-4">
+      <div class="toolbar mb-4 overflow-x-auto whitespace-nowrap pb-2">
         <el-button
           type="primary"
           :icon="useRenderIcon('ep:plus')"
@@ -423,6 +420,7 @@ async function openRegisterConfigDialog(uuid: string) {
         <el-button
           type="danger"
           :icon="useRenderIcon('ep:delete')"
+          :disabled="selectedIds.length === 0"
           @click="onBatchDel"
         >
           批量删除
@@ -430,6 +428,7 @@ async function openRegisterConfigDialog(uuid: string) {
         <el-button
           type="success"
           :icon="useRenderIcon('ep:circle-check')"
+          :disabled="selectedIds.length === 0"
           @click="onBatchUpdateStatus(1)"
         >
           批量启用
@@ -437,11 +436,14 @@ async function openRegisterConfigDialog(uuid: string) {
         <el-button
           type="warning"
           :icon="useRenderIcon('ep:circle-close')"
+          :disabled="selectedIds.length === 0"
           @click="onBatchUpdateStatus(0)"
         >
           批量禁用
         </el-button>
-      </template>
+      </div>
+
+      <PureTableBar title="应用列表" :columns="columns" @refresh="onSearch">
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
           ref="tableRef"
@@ -537,5 +539,19 @@ async function openRegisterConfigDialog(uuid: string) {
         </div>
       </template>
     </PureTableBar>
+    </el-card>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.search-form {
+  :deep(.el-form-item) {
+    margin-bottom: 12px;
+  }
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+}
+</style>

@@ -24,5 +24,7 @@ export const deleteVariable = (data?: object) => {
 };
 
 export const batchDeleteVariables = (data?: object) => {
-  return http.request<Result>("post", "/api/admin/variable/batch_delete", { data });
+  return http.request<Result>("post", "/api/admin/variable/batch_delete", {
+    data
+  });
 };

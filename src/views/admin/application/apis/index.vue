@@ -31,7 +31,7 @@ const {
       ref="formRef"
       :inline="true"
       :model="form"
-      class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
+      class="search-form bg-bg_color w-full pl-8 pt-3 overflow-auto"
     >
       <el-form-item label="所属应用" prop="app_uuid">
         <el-select
@@ -48,7 +48,7 @@ const {
           />
         </el-select>
       </el-form-item>
-      
+
       <el-form-item label="接口类型" prop="api_type">
         <el-select
           v-model="form.api_type"
@@ -74,59 +74,64 @@ const {
         >
           搜索
         </el-button>
-        <el-button :icon="useRenderIcon('ep:refresh')" @click="resetForm(formRef)">
+        <el-button
+          :icon="useRenderIcon('ep:refresh')"
+          @click="resetForm(formRef)"
+        >
           重置
         </el-button>
       </el-form-item>
     </el-form>
 
-    <PureTableBar title="接口设置" :columns="columns" @refresh="onSearch">
-      <template v-slot="{ size, dynamicColumns }">
-        <pure-table
-          ref="tableRef"
-          row-key="id"
-          table-layout="auto"
-          show-overflow-tooltip
-          border
-          :loading="loading"
-          :size="size"
-          :data="dataList"
-          :columns="dynamicColumns"
-          :header-cell-style="{
-            background: 'var(--el-fill-color-light)',
-            color: 'var(--el-text-color-primary)'
-          }"
-          class="w-full"
-        >
-          <template #operation="{ row }">
-            <el-button
-              class="reset-margin"
-              link
-              type="primary"
-              :size="size"
-              :icon="useRenderIcon('ep:edit')"
-              @click="openDialog('修改接口配置', row)"
-            >
-              配置
-            </el-button>
-          </template>
-        </pure-table>
-        <div class="flex mt-4 w-full overflow-x-auto">
-          <div class="ml-auto shrink-0">
-            <el-pagination
-              v-model:current-page="pagination.currentPage"
-              v-model:page-size="pagination.pageSize"
-              :page-sizes="[10, 20, 30, 50, 100, 200, 500, 1000, 2000]"
-              :background="true"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="pagination.total"
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-            />
+    <el-card shadow="never" class="table-wrapper mt-4">
+      <PureTableBar title="接口设置" :columns="columns" @refresh="onSearch">
+        <template v-slot="{ size, dynamicColumns }">
+          <pure-table
+            ref="tableRef"
+            row-key="id"
+            table-layout="auto"
+            show-overflow-tooltip
+            border
+            :loading="loading"
+            :size="size"
+            :data="dataList"
+            :columns="dynamicColumns"
+            :header-cell-style="{
+              background: 'var(--el-fill-color-light)',
+              color: 'var(--el-text-color-primary)'
+            }"
+            class="w-full"
+          >
+            <template #operation="{ row }">
+              <el-button
+                class="reset-margin"
+                link
+                type="primary"
+                :size="size"
+                :icon="useRenderIcon('ep:edit')"
+                @click="openDialog('修改接口配置', row)"
+              >
+                配置
+              </el-button>
+            </template>
+          </pure-table>
+          <div class="flex mt-4 w-full overflow-x-auto">
+            <div class="ml-auto shrink-0">
+              <el-pagination
+                v-model:current-page="pagination.currentPage"
+                v-model:page-size="pagination.pageSize"
+                :page-sizes="[10, 20, 30, 50, 100, 200, 500, 1000, 2000]"
+                :background="true"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="pagination.total"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+              />
+            </div>
           </div>
-        </div>
-      </template>
-    </PureTableBar>
+        </template>
+      </PureTableBar>
+    </el-card>
   </div>
 </template>
 

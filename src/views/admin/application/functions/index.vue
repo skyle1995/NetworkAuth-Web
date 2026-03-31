@@ -68,9 +68,9 @@ async function onBatchDel() {
       ref="formRef"
       :inline="true"
       :model="form"
-      class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
+      class="search-form bg-bg_color w-full pl-8 pt-3 overflow-auto"
     >
-      <el-form-item label="搜索" prop="search">
+      <el-form-item label="搜索内容" prop="search">
         <el-input
           v-model="form.search"
           placeholder="编号/别名/代码/备注"
@@ -117,8 +117,8 @@ async function onBatchDel() {
       </el-form-item>
     </el-form>
 
-    <PureTableBar title="公共函数管理" :columns="columns" @refresh="onSearch">
-      <template #buttons>
+    <el-card shadow="never" class="table-wrapper mt-4">
+      <div class="toolbar mb-4 overflow-x-auto whitespace-nowrap pb-2">
         <el-button
           type="primary"
           :icon="useRenderIcon('ep:plus')"
@@ -134,7 +134,9 @@ async function onBatchDel() {
         >
           批量删除
         </el-button>
-      </template>
+      </div>
+
+      <PureTableBar title="公共函数管理" :columns="columns" @refresh="onSearch">
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
           ref="tableRef"
@@ -192,5 +194,19 @@ async function onBatchDel() {
         </div>
       </template>
     </PureTableBar>
+    </el-card>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.search-form {
+  :deep(.el-form-item) {
+    margin-bottom: 12px;
+  }
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+}
+</style>

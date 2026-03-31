@@ -79,8 +79,8 @@ const handleSelect = (key: string) => {
             inline-prompt
             :active-icon="dayIcon"
             :inactive-icon="darkIcon"
-            @change="dataThemeChange"
             class="theme-switch"
+            @change="dataThemeChange"
           />
           <el-dropdown trigger="click" @command="handleSelect">
             <el-button class="mobile-menu-btn" text>
@@ -125,8 +125,8 @@ const handleSelect = (key: string) => {
             inline-prompt
             :active-icon="dayIcon"
             :inactive-icon="darkIcon"
-            @change="dataThemeChange"
             class="theme-switch"
+            @change="dataThemeChange"
           />
           <el-button type="primary" @click="goAdmin">
             {{ isLogged ? "进入控制台" : "管理员登录" }}
@@ -166,7 +166,9 @@ const handleSelect = (key: string) => {
     Arial, sans-serif;
   background-color: var(--el-bg-color-page);
   color: var(--el-text-color-primary);
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 .header {
@@ -176,7 +178,9 @@ const handleSelect = (key: string) => {
   background-color: var(--el-bg-color-overlay);
   backdrop-filter: blur(10px);
   box-shadow: var(--el-box-shadow-light);
-  transition: background-color 0.3s, box-shadow 0.3s;
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s;
 
   .header-content {
     display: flex;
