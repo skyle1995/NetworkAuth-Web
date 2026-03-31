@@ -52,7 +52,7 @@ export const getLogin = async (data: any) => {
           nickname: res.data?.nickname || "管理员",
           roles: ["admin"],
           permissions: ["*:*:*"],
-          accessToken: "cookie-based-token",
+          accessToken: res.data?.token || "",
           refreshToken: "cookie-based-refresh-token",
           expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
         }

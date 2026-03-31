@@ -66,8 +66,8 @@ const getSectionStyle = computed(() => {
       ? ""
       : `padding-top: 0;${
           hideTabs.value
-            ? "min-height: calc(100vh - 48px);"
-            : "min-height: calc(100vh - 86px);"
+            ? "min-height: calc(100vh - 48px); min-height: calc(100dvh - 48px);"
+            : "min-height: calc(100vh - 86px); min-height: calc(100dvh - 86px);"
         }`
   ];
 });
@@ -197,6 +197,9 @@ const transitionMain = defineComponent({
   position: relative;
   width: 100%;
   height: 100vh;
+  @supports (height: 100dvh) {
+    height: 100dvh;
+  }
   overflow-x: hidden;
 }
 
@@ -205,9 +208,14 @@ const transitionMain = defineComponent({
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-height: 100vh;
+  @supports (min-height: 100dvh) {
+    min-height: 100dvh;
+  }
 }
 
 .main-content {
   margin: 24px;
+  flex: 1;
 }
 </style>

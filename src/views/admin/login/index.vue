@@ -57,9 +57,10 @@ getCsrfToken().then(res => {
 
 const onLogin = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
+  if (loading.value) return;
+  loading.value = true;
   await formEl.validate(valid => {
     if (valid) {
-      loading.value = true;
       useUserStoreHook()
         .loginByUsername({
           username: ruleForm.username,
@@ -88,6 +89,8 @@ const onLogin = async (formEl: FormInstance | undefined) => {
           refreshCaptcha(); // 登录失败后刷新验证码
         })
         .finally(() => (loading.value = false));
+    } else {
+      loading.value = false;
     }
   });
 };

@@ -206,6 +206,10 @@ const LayHeader = defineComponent({
   position: relative;
   width: 100%;
   height: 100%;
+  min-height: 100vh;
+  @supports (min-height: 100dvh) {
+    min-height: 100dvh;
+  }
 
   &::after {
     clear: both;

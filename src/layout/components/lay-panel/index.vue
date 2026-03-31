@@ -97,6 +97,9 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 :deep(.el-scrollbar) {
   height: calc(100vh - 110px);
+  @supports (height: calc(100dvh - 110px)) {
+    height: calc(100dvh - 110px);
+  }
 }
 
 .right-panel-background {
