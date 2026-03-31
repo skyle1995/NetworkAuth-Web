@@ -281,7 +281,8 @@ function formatTwoStageRoutes(routesList: RouteRecordRaw[]) {
     const rootPath = match ? match[0] : "/";
 
     // 判断该路由是否应该是一个独立的 Layout 根节点（这里以 /admin, /user 为例）
-    const isLayoutRoot = rootPath === "/admin" || rootPath === "/user";
+    const isLayoutRoot =
+      rootPath === "/admin" || rootPath === "/user" || rootPath === "/home";
 
     if (isLayoutRoot) {
       // 查找是否已经创建了对应的根节点

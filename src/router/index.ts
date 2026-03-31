@@ -230,7 +230,11 @@ router.beforeEach((to: ToRouteType, _from, next) => {
     }
   } else {
     if (to.path !== "/admin/login") {
-      if (whiteList.indexOf(to.path) !== -1 || to.path.startsWith("/error/")) {
+      if (
+        whiteList.indexOf(to.path) !== -1 ||
+        to.path.startsWith("/error/") ||
+        to.path.startsWith("/home/")
+      ) {
         next();
       } else {
         removeToken();

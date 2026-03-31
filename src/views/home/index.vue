@@ -54,14 +54,16 @@ const goAdmin = () => {
   margin-bottom: 24px;
   font-size: 48px;
   font-weight: 700;
-  color: #303133;
+  color: var(--el-text-color-primary);
+  transition: color 0.3s;
 }
 
 .subtitle {
   margin-bottom: 40px;
   font-size: 20px;
   line-height: 1.6;
-  color: #606266;
+  color: var(--el-text-color-regular);
+  transition: color 0.3s;
 }
 
 .hero-actions {

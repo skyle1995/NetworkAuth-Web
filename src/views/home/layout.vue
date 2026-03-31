@@ -5,6 +5,10 @@ import { storageLocal } from "@pureadmin/utils";
 import { type DataInfo, userKey } from "@/utils/auth";
 import { getConfig } from "@/config";
 import MenuIcon from "~icons/ri/menu-line";
+import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
+
+import dayIcon from "@/assets/svg/day.svg?component";
+import darkIcon from "@/assets/svg/dark.svg?component";
 
 defineOptions({
   name: "HomeLayout"
@@ -12,6 +16,10 @@ defineOptions({
 
 const router = useRouter();
 const route = useRoute();
+
+const { dataTheme, overallStyle, dataThemeChange } = useDataThemeChange();
+// 页面加载时根据本地存储初始化主题
+dataThemeChange(overallStyle.value);
 
 // 当前激活的菜单项
 const activeMenu = ref(route.path);
@@ -66,6 +74,14 @@ const handleSelect = (key: string) => {
 
         <!-- 移动端下拉菜单 -->
         <div class="mobile-nav">
+          <el-switch
+            v-model="dataTheme"
+            inline-prompt
+            :active-icon="dayIcon"
+            :inactive-icon="darkIcon"
+            @change="dataThemeChange"
+            class="theme-switch"
+          />
           <el-dropdown trigger="click" @command="handleSelect">
             <el-button class="mobile-menu-btn" text>
               <el-icon :size="24"><MenuIcon /></el-icon>
@@ -104,6 +120,14 @@ const handleSelect = (key: string) => {
 
         <!-- 右侧操作 -->
         <div class="actions desktop-nav">
+          <el-switch
+            v-model="dataTheme"
+            inline-prompt
+            :active-icon="dayIcon"
+            :inactive-icon="darkIcon"
+            @change="dataThemeChange"
+            class="theme-switch"
+          />
           <el-button type="primary" @click="goAdmin">
             {{ isLogged ? "进入控制台" : "管理员登录" }}
           </el-button>
@@ -140,16 +164,19 @@ const handleSelect = (key: string) => {
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
-  background-color: #f5f7fa;
+  background-color: var(--el-bg-color-page);
+  color: var(--el-text-color-primary);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .header {
   position: sticky;
   top: 0;
   z-index: 10;
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: var(--el-bg-color-overlay);
   backdrop-filter: blur(10px);
-  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  box-shadow: var(--el-box-shadow-light);
+  transition: background-color 0.3s, box-shadow 0.3s;
 
   .header-content {
     display: flex;
@@ -177,11 +204,16 @@ const handleSelect = (key: string) => {
 .logo-text {
   font-size: 20px;
   font-weight: 600;
-  color: #303133;
+  color: var(--el-text-color-primary);
+  transition: color 0.3s;
 }
 
 .mobile-nav {
   display: none;
+}
+
+.theme-switch {
+  margin-right: 15px;
 }
 
 .nav-menu {
@@ -199,7 +231,7 @@ const handleSelect = (key: string) => {
       line-height: 64px;
       font-size: 15px;
       font-weight: 500;
-      color: #606266;
+      color: var(--el-text-color-regular);
       border-bottom: 2px solid transparent;
 
       &:hover {
@@ -220,6 +252,7 @@ const handleSelect = (key: string) => {
   min-width: 200px;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .main-content {
@@ -244,9 +277,10 @@ const handleSelect = (key: string) => {
 
 .footer {
   padding: 20px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   font-size: 14px;
   text-align: center;
+  transition: color 0.3s;
 
   .footer-content {
     display: flex;
@@ -264,7 +298,7 @@ const handleSelect = (key: string) => {
     flex-wrap: wrap;
 
     .record-link {
-      color: #909399;
+      color: var(--el-text-color-secondary);
       text-decoration: none;
       transition: color 0.3s;
 
@@ -274,8 +308,9 @@ const handleSelect = (key: string) => {
     }
 
     .divider {
-      color: #dcdfe6;
+      color: var(--el-border-color);
       font-size: 12px;
+      transition: color 0.3s;
     }
   }
 }
@@ -301,6 +336,7 @@ const handleSelect = (key: string) => {
   .mobile-nav {
     display: flex;
     flex: 1;
+    align-items: center;
     justify-content: flex-end;
     margin-left: 10px;
 
