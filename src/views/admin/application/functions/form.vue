@@ -1,6 +1,18 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, reactive, watch, nextTick } from "vue";
 import { formRules } from "./rule";
+import Codemirror from "codemirror-editor-vue3";
+import type { Editor, EditorConfiguration } from "codemirror";
+
+import "codemirror/lib/codemirror.css";
+import "codemirror/theme/material-darker.css";
+import "codemirror/addon/hint/show-hint.css";
+import "codemirror/addon/hint/show-hint";
+import "codemirror/addon/hint/javascript-hint.js";
+import "codemirror/mode/javascript/javascript.js";
+import "codemirror/addon/display/autorefresh.js";
+
+import { useDark } from "@pureadmin/utils";
 
 export interface FormProps {
   formInline: {
@@ -26,6 +38,43 @@ const props = withDefaults(defineProps<FormProps>(), {
 
 const ruleFormRef = ref();
 const newFormInline = ref(props.formInline);
+const { isDark } = useDark();
+
+const cminstance = ref<Editor | null>(null);
+const cmOptions: EditorConfiguration = reactive({
+  mode: "javascript",
+  theme: isDark.value ? "material-darker" : "default",
+  tabSize: 4,
+  readOnly: false,
+  autofocus: true,
+  autoRefresh: true,
+  lineNumbers: true,
+  lineWiseCopyCut: true,
+  gutters: ["CodeMirror-lint-markers"],
+  lint: true,
+  extraKeys: {
+    Ctrl: "autocomplete",
+    Tab: "autocomplete"
+  },
+  hintOptions: {
+    completeSingle: false
+  }
+});
+
+const onReady = (cm: Editor) => {
+  cminstance.value = cm;
+  cm.on("keypress", () => cm.showHint());
+};
+
+watch(
+  () => isDark.value,
+  async newVal => {
+    await nextTick();
+    newVal
+      ? cminstance.value.setOption("theme", "material-darker")
+      : cminstance.value.setOption("theme", "default");
+  }
+);
 
 function getRef() {
   return ruleFormRef.value;
@@ -77,11 +126,14 @@ defineExpose({ getRef });
     <el-row>
       <el-col :span="24">
         <el-form-item label="函数代码" prop="code">
-          <el-input
-            v-model="newFormInline.code"
-            type="textarea"
-            :rows="10"
+          <Codemirror
+            v-model:value="newFormInline.code"
+            :options="cmOptions"
+            :border="true"
             placeholder="请输入函数代码"
+            width="100%"
+            height="200px"
+            @ready="onReady"
           />
         </el-form-item>
       </el-col>
@@ -101,3 +153,15 @@ defineExpose({ getRef });
     </el-row>
   </el-form>
 </template>
+
+<style lang="scss" scoped>
+.codemirror-container.bordered {
+  border: 1px solid var(--pure-border-color);
+}
+
+:deep(.CodeMirror) {
+  line-height: 1.5;
+  text-align: left;
+  font-family: Consolas, "Courier New", monospace;
+}
+</style>

@@ -22,7 +22,7 @@ const form = reactive({
   db_name: "demo",
   db_user: "",
   db_pass: "",
-  site_title: "NetworkAuth 系统",
+  site_title: "NetworkAuth",
   admin_username: "admin",
   admin_password: "",
   confirm_password: ""
@@ -178,7 +178,7 @@ const handleInstall = async () => {
 
         <div class="section-title mt-6">2. 站点信息</div>
         <el-form-item label="站点标题" prop="site_title">
-          <el-input v-model="form.site_title" placeholder="NetworkAuth 系统" />
+          <el-input v-model="form.site_title" placeholder="NetworkAuth" />
         </el-form-item>
 
         <div class="section-title mt-6">3. 管理员设置</div>
