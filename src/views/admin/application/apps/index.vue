@@ -409,7 +409,7 @@ async function openRegisterConfigDialog(uuid: string) {
     </el-form>
 
     <el-card shadow="never" class="table-wrapper mt-4">
-      <div class="toolbar mb-4 overflow-x-auto whitespace-nowrap pb-2">
+      <div class="toolbar mb-4 px-2 overflow-x-auto whitespace-nowrap pb-2">
         <el-button
           type="primary"
           :icon="useRenderIcon('ep:plus')"
