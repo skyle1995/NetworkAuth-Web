@@ -69,7 +69,22 @@ export default defineComponent({
     );
     let checkColumnList = getKeyList(cloneDeep(props?.columns), "label");
     const checkedColumns = ref(getKeyList(cloneDeep(filterColumns), "label"));
-    const dynamicColumns = ref(cloneDeep(props?.columns));
+
+    const withEmptyFormatter = (columns: any[]) => {
+      return columns.map(col => {
+        if (col.type === "selection" || col.type === "index" || col.type === "expand") return col;
+        if (col.slot || col.cellRenderer) return col;
+
+        const originalFormatter = col.formatter;
+        col.formatter = (row: any, column: any, cellValue: any, index: number) => {
+          let val = originalFormatter ? originalFormatter(row, column, cellValue, index) : cellValue;
+          return (val === "" || val === null || val === undefined) ? "-" : val;
+        };
+        return col;
+      });
+    };
+
+    const dynamicColumns = ref(withEmptyFormatter(cloneDeep(props?.columns)));
 
     const getDropdownItemStyle = computed(() => {
       return s => {
@@ -153,7 +168,7 @@ export default defineComponent({
     async function onReset() {
       checkAll.value = true;
       isIndeterminate.value = false;
-      dynamicColumns.value = cloneDeep(props?.columns);
+      dynamicColumns.value = withEmptyFormatter(cloneDeep(props?.columns));
       checkColumnList = [];
       checkColumnList = await getKeyList(cloneDeep(props?.columns), "label");
       checkedColumns.value = getKeyList(cloneDeep(filterColumns), "label");

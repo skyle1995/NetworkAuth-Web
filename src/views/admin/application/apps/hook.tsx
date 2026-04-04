@@ -58,12 +58,12 @@ export function useApp() {
     {
       label: "UUID",
       prop: "uuid",
-      minWidth: 320
+      width: 320
     },
     {
       label: "密钥",
       prop: "secret",
-      minWidth: 320
+      width: 320
     },
     {
       label: "版本",

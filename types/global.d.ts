@@ -112,6 +112,7 @@ declare global {
     TooltipEffect?: Effect;
     ResponsiveStorageNameSpace?: string;
     MenuSearchHistory?: number;
+    HideLoginEntrance?: boolean;
   }
 
   /**

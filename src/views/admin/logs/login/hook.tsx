@@ -6,6 +6,7 @@ import { reactive, ref, onMounted, toRaw } from "vue";
 
 export function useRole() {
   const form = reactive({
+    uuid: "",
     username: "",
     status: ""
   });
@@ -25,21 +26,26 @@ export function useRole() {
       width: 100
     },
     {
-      label: "登录时间",
-      prop: "created_at",
-      width: 180,
-      formatter: ({ created_at }) =>
-        dayjs(created_at).format("YYYY-MM-DD HH:mm:ss")
-    },
-    {
       label: "用户名",
       prop: "username",
       width: 180
     },
     {
+      label: "UUID",
+      prop: "uuid",
+      width: 320
+    },
+    {
       label: "登录 IP",
       prop: "ip",
       width: 200
+    },
+    {
+      label: "登录时间",
+      prop: "created_at",
+      width: 180,
+      formatter: ({ created_at }) =>
+        dayjs(created_at).format("YYYY-MM-DD HH:mm:ss")
     },
     {
       label: "登录状态",

@@ -109,7 +109,7 @@ const {
     justify-content: flex-end;
     min-width: 280px;
     height: 48px;
-    color: #000000d9;
+    color: var(--el-text-color-regular);
 
     .el-dropdown-link {
       display: flex;
@@ -117,7 +117,7 @@ const {
       justify-content: space-around;
       height: 48px;
       padding: 10px;
-      color: #000000d9;
+      color: var(--el-text-color-regular);
       cursor: pointer;
 
       p {

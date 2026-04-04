@@ -26,7 +26,7 @@ export function useFunction() {
 
   const pagination = reactive<PaginationProps>({
     total: 0,
-    pageSize: 10,
+    pageSize: 30,
     currentPage: 1,
     background: true
   });

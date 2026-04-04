@@ -3,11 +3,13 @@ import { ref } from "vue";
 import { useRole } from "./hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import { useUserStoreHook } from "@/store/modules/user";
 
 defineOptions({
   name: "LoginLog"
 });
 
+const userStore = useUserStoreHook();
 const formRef = ref();
 const tableRef = ref();
 
@@ -36,7 +38,7 @@ const {
       <el-form-item label="所属账号" prop="username">
         <el-input
           v-model="form.username"
-          placeholder="请输入用户名"
+          placeholder="请输入账号或UUID"
           clearable
           class="w-37.5!"
         />
@@ -71,7 +73,7 @@ const {
     </el-form>
 
     <PureTableBar title="登录日志" :columns="columns" @refresh="onSearch">
-      <template #buttons>
+      <template #buttons v-if="userStore.roles.includes('admin') && userStore.roles.length === 1">
         <el-popconfirm title="确定要清空所有日志数据吗？" @confirm="clearAll">
           <template #reference>
             <el-button type="danger" :icon="useRenderIcon('ep:delete')">
@@ -102,7 +104,7 @@ const {
             <el-pagination
               v-model:current-page="pagination.currentPage"
               v-model:page-size="pagination.pageSize"
-              :page-sizes="[10, 20, 30, 50, 100, 200, 500, 1000, 2000]"
+              :page-sizes="[10, 20, 30, 50, 100, 200, 500, 1000]"
               :background="true"
               layout="total, sizes, prev, pager, next, jumper"
               :total="pagination.total"

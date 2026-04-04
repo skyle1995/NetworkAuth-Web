@@ -114,8 +114,7 @@ export function resetRouter() {
   resetLoadedPaths();
 }
 
-/** 路由白名单 */
-const whiteList = ["/admin/login", "/", "/home", "/install"];
+
 
 const { VITE_HIDE_HOME } = import.meta.env;
 
@@ -229,19 +228,20 @@ router.beforeEach((to: ToRouteType, _from, next) => {
       toCorrectRoute();
     }
   } else {
-    if (to.path !== "/admin/login") {
-      if (
-        whiteList.indexOf(to.path) !== -1 ||
-        to.path.startsWith("/error/") ||
-        to.path.startsWith("/home/")
-      ) {
+    // 黑名单模式：只有 /admin 或 /user 开头的路由需要认证
+    if (to.path.startsWith("/admin") || to.path.startsWith("/user")) {
+      if (to.path === "/admin/login") {
         next();
       } else {
         removeToken();
         next({ path: "/admin/login" });
       }
     } else {
-      next();
+      if (to.matched.length === 0) {
+        next({ path: "/error/404" });
+      } else {
+        next();
+      }
     }
   }
 });

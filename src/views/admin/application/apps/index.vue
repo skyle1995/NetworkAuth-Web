@@ -528,7 +528,7 @@ async function openRegisterConfigDialog(uuid: string) {
             <el-pagination
               v-model:current-page="pagination.currentPage"
               v-model:page-size="pagination.pageSize"
-              :page-sizes="[10, 20, 30, 50, 100, 200, 500, 1000, 2000]"
+              :page-sizes="[10, 20, 30, 50, 100, 200, 500, 1000]"
               :background="true"
               layout="total, sizes, prev, pager, next, jumper"
               :total="pagination.total"

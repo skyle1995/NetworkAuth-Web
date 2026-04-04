@@ -54,6 +54,28 @@ const handleSelect = (key: string) => {
     router.push(key);
   }
 };
+// 动态导航菜单配置方案
+const navMenus = computed(() => {
+  const menus = [
+    {
+      title: "首页",
+      path: "/home/index",
+      show: true,
+      activePaths: ["/home/index", "/home"]
+    }
+  ];
+  return menus.filter(item => item.show);
+});
+
+// 动态动作菜单配置方案 (控制按钮/下拉显隐)
+const actionMenus = computed(() => {
+  const config = getConfig() || ({} as any);
+  const showLogin = config.HideLoginEntrance !== true;
+  
+  return {
+    showAdminLogin: showLogin
+  };
+});
 </script>
 
 <template>
@@ -88,16 +110,18 @@ const handleSelect = (key: string) => {
             </el-button>
             <template #dropdown>
               <el-dropdown-menu>
+                <!-- 动态渲染中间菜单项 -->
                 <el-dropdown-item
-                  command="/home/index"
-                  :style="
-                    activeMenu === '/home/index' || activeMenu === '/home'
-                      ? 'color: var(--el-color-primary); background-color: var(--el-color-primary-light-9)'
-                      : ''
-                  "
-                  >首页</el-dropdown-item
+                  v-for="menu in navMenus"
+                  :key="menu.path"
+                  :command="menu.path"
+                  :style="menu.activePaths.includes(activeMenu) ? 'color: var(--el-color-primary); background-color: var(--el-color-primary-light-9)' : ''"
                 >
-                <el-dropdown-item divided command="admin">
+                  {{ menu.title }}
+                </el-dropdown-item>
+                
+                <!-- 动态渲染登录入口 -->
+                <el-dropdown-item v-if="actionMenus.showAdminLogin" divided command="admin">
                   {{ isLogged ? "进入控制台" : "管理员登录" }}
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -114,7 +138,14 @@ const handleSelect = (key: string) => {
             :ellipsis="false"
             @select="handleSelect"
           >
-            <el-menu-item index="/home/index">首页</el-menu-item>
+            <!-- 动态渲染中间菜单项 -->
+            <el-menu-item 
+              v-for="menu in navMenus" 
+              :key="menu.path" 
+              :index="menu.path"
+            >
+              {{ menu.title }}
+            </el-menu-item>
           </el-menu>
         </div>
 
@@ -128,9 +159,11 @@ const handleSelect = (key: string) => {
             class="theme-switch"
             @change="dataThemeChange"
           />
-          <el-button type="primary" @click="goAdmin">
-            {{ isLogged ? "进入控制台" : "管理员登录" }}
-          </el-button>
+          <template v-if="actionMenus.showAdminLogin">
+            <el-button type="primary" @click="goAdmin">
+              {{ isLogged ? "进入控制台" : "管理员登录" }}
+            </el-button>
+          </template>
         </div>
       </div>
     </header>

@@ -106,6 +106,10 @@ const formatDate = (dateStr: string) => {
   return dayjs(dateStr).format("YYYY-MM-DD HH:mm:ss");
 };
 
+const emptyFormatter = (row: any, column: any, cellValue: any) => {
+  return (cellValue === "" || cellValue === null || cellValue === undefined) ? "-" : cellValue;
+};
+
 let timer: any = null;
 
 const formattedUptime = computed(() => {
@@ -251,34 +255,24 @@ onUnmounted(() => {
                 {{ formatDate(scope.row.created_at) }}
               </template>
             </el-table-column>
-            <el-table-column prop="username" label="用户名" width="150" />
-            <el-table-column prop="ip" label="登录IP" width="200" />
-            <el-table-column
-              prop="status"
-              label="登录状态"
-              width="100"
-              align="center"
-            >
+            <el-table-column prop="username" label="用户名" width="150" :formatter="emptyFormatter" />
+            <el-table-column prop="ip" label="登录IP" width="200" :formatter="emptyFormatter" />
+            <el-table-column prop="status" label="登录状态" width="100" align="center">
               <template #default="scope">
                 <el-tag :type="scope.row.status === 1 ? 'success' : 'danger'">
                   {{ scope.row.status === 1 ? "成功" : "失败" }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="message" label="登录信息" width="150" />
-            <el-table-column
-              prop="user_agent"
-              label="浏览器类型"
-              min-width="320"
-              show-overflow-tooltip
-            />
+            <el-table-column prop="message" label="登录信息" width="150" :formatter="emptyFormatter" />
+            <el-table-column prop="user_agent" label="浏览器类型" min-width="320" show-overflow-tooltip :formatter="emptyFormatter" />
           </el-table>
           <div class="flex mt-4 w-full overflow-x-auto">
             <div class="ml-auto shrink-0">
               <el-pagination
                 v-model:current-page="pagination.currentPage"
                 v-model:page-size="pagination.pageSize"
-                :page-sizes="[10, 20, 30, 50, 100, 200, 500, 1000, 2000]"
+                :page-sizes="[10, 20, 30, 50, 100, 200, 500, 1000]"
                 :background="true"
                 layout="total, sizes, prev, pager, next, jumper"
                 :total="totalLogs"

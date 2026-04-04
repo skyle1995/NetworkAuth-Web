@@ -50,7 +50,7 @@ export const getLogin = async (data: any) => {
           avatar: res.data?.avatar || "",
           username: res.data?.username || data.username,
           nickname: res.data?.nickname || "管理员",
-          roles: ["admin"],
+          roles: res.data?.role === 0 ? ["super_admin"] : ["admin"],
           permissions: ["*:*:*"],
           accessToken: res.data?.token || "",
           refreshToken: "cookie-based-refresh-token",
