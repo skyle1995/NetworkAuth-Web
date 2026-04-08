@@ -61,6 +61,7 @@ const contextmenuRef = ref();
 const isShowArrow = ref(false);
 const topPath = getTopMenu()?.path;
 const { VITE_HIDE_HOME } = import.meta.env;
+const getRandomKey = () => window.crypto.randomUUID();
 const fixedTags = [
   ...routerArrays,
   ...usePermissionStoreHook().flatteningRoutes.filter(v => v?.meta?.fixedTag)
@@ -645,7 +646,7 @@ onBeforeUnmount(() => {
       <ul
         v-show="visible"
         ref="contextmenuRef"
-        :key="Math.random()"
+        :key="getRandomKey()"
         :style="getContextMenuStyle"
         class="contextmenu"
       >
