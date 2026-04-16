@@ -28,6 +28,15 @@ export default {
         icon: "ep/setting",
         title: "系统设置"
       }
+    },
+    {
+      path: "/admin/system/portal-navigation",
+      name: "PortalNavigationIndex",
+      component: () => import("@/views/admin/system/portal-navigation/index.vue"),
+      meta: {
+        icon: "ep:operation",
+        title: "导航设置"
+      }
     }
   ]
 } satisfies RouteConfigsTable;

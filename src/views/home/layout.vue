@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { storageLocal } from "@pureadmin/utils";
+import { isUrl, storageLocal } from "@pureadmin/utils";
 import { type DataInfo, userKey } from "@/utils/auth";
 import { getConfig } from "@/config";
+import {
+  getPublicPortalNavigationList,
+  type PortalNavigationItem
+} from "@/api/admin/portalNavigation";
 import MenuIcon from "~icons/ri/menu-line";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
 
@@ -16,6 +20,8 @@ defineOptions({
 
 const router = useRouter();
 const route = useRoute();
+const navMenus = ref<PortalNavigationItem[]>([]);
+const adminMenu = ref<PortalNavigationItem | null>(null);
 
 const { dataTheme, overallStyle, dataThemeChange } = useDataThemeChange();
 // 页面加载时根据本地存储初始化主题
@@ -32,7 +38,7 @@ watch(
   }
 );
 
-// 检查是否已登录
+// 检查管理员是否已登录
 const isLogged = computed(() => {
   const userInfo = storageLocal().getItem<DataInfo<number>>(userKey);
   return !!userInfo;
@@ -48,32 +54,81 @@ const goAdmin = () => {
 };
 
 const handleSelect = (key: string) => {
-  if (key === "admin") {
-    goAdmin();
-  } else {
-    router.push(key);
+  const matchedMenu =
+    navMenus.value.find(item => item.path === key) ||
+    (actionMenus.value.adminMenu?.path === key ? actionMenus.value.adminMenu : null);
+
+  switch (key) {
+    case "admin":
+      goAdmin();
+      break;
+    default:
+      if (matchedMenu?.is_external || isUrl(key)) {
+        window.open(key, "_blank");
+        return;
+      }
+      router.push(key);
+      break;
   }
 };
-// 动态导航菜单配置方案
-const navMenus = computed(() => {
-  const menus = [
-    {
-      title: "首页",
-      path: "/home/index",
-      show: true,
-      activePaths: ["/home/index", "/home"]
+
+/**
+ * 获取门户公开导航
+ * 从后台读取当前可见导航项并用于顶部菜单展示
+ */
+const fetchPortalNavigationList = async () => {
+  try {
+    const res = await getPublicPortalNavigationList();
+    switch (res.code) {
+      case 0:
+        navMenus.value = (res.data || []).filter(item => item.path !== "admin");
+        adminMenu.value = (res.data || []).find(item => item.path === "admin") || null;
+        break;
+      default:
+        navMenus.value = [];
+        adminMenu.value = null;
+        break;
     }
-  ];
-  return menus.filter(item => item.show);
+  } catch {
+    navMenus.value = [];
+    adminMenu.value = null;
+  }
+};
+
+/**
+ * 获取导航显示名称
+ * 管理员入口在登录后统一展示为进入控制台
+ */
+const getMenuName = (menu: PortalNavigationItem) => {
+  switch (menu.path) {
+    case "admin":
+      return isLogged.value ? "进入控制台" : menu.name;
+    default:
+      return menu.name;
+  }
+};
+
+/**
+ * 判断菜单是否激活
+ * 对首页链接额外兼容 /home 与 /home/index 两种路径
+ */
+const isMenuActive = (menu: PortalNavigationItem) => {
+  switch (menu.path) {
+    case "/home/index":
+      return activeMenu.value === "/home/index" || activeMenu.value === "/home";
+    default:
+      return activeMenu.value === menu.path;
+  }
+};
+
+onMounted(() => {
+  fetchPortalNavigationList();
 });
 
 // 动态动作菜单配置方案 (控制按钮/下拉显隐)
 const actionMenus = computed(() => {
-  const config = getConfig() || ({} as any);
-  const showLogin = config.HideLoginEntrance !== true;
-  
   return {
-    showAdminLogin: showLogin
+    adminMenu: adminMenu.value
   };
 });
 </script>
@@ -101,8 +156,8 @@ const actionMenus = computed(() => {
             inline-prompt
             :active-icon="dayIcon"
             :inactive-icon="darkIcon"
-            class="theme-switch"
             @change="dataThemeChange"
+            class="theme-switch"
           />
           <el-dropdown trigger="click" @command="handleSelect">
             <el-button class="mobile-menu-btn" text>
@@ -115,14 +170,17 @@ const actionMenus = computed(() => {
                   v-for="menu in navMenus"
                   :key="menu.path"
                   :command="menu.path"
-                  :style="menu.activePaths.includes(activeMenu) ? 'color: var(--el-color-primary); background-color: var(--el-color-primary-light-9)' : ''"
+                  :style="isMenuActive(menu) ? 'color: var(--el-color-primary); background-color: var(--el-color-primary-light-9)' : ''"
                 >
-                  {{ menu.title }}
+                  {{ getMenuName(menu) }}
                 </el-dropdown-item>
-                
-                <!-- 动态渲染登录入口 -->
-                <el-dropdown-item v-if="actionMenus.showAdminLogin" divided command="admin">
-                  {{ isLogged ? "进入控制台" : "管理员登录" }}
+
+                <el-dropdown-item
+                  v-if="actionMenus.adminMenu"
+                  divided
+                  :command="actionMenus.adminMenu.path"
+                >
+                  {{ getMenuName(actionMenus.adminMenu) }}
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -144,7 +202,7 @@ const actionMenus = computed(() => {
               :key="menu.path" 
               :index="menu.path"
             >
-              {{ menu.title }}
+              {{ getMenuName(menu) }}
             </el-menu-item>
           </el-menu>
         </div>
@@ -156,14 +214,16 @@ const actionMenus = computed(() => {
             inline-prompt
             :active-icon="dayIcon"
             :inactive-icon="darkIcon"
-            class="theme-switch"
             @change="dataThemeChange"
+            class="theme-switch"
           />
-          <template v-if="actionMenus.showAdminLogin">
-            <el-button type="primary" @click="goAdmin">
-              {{ isLogged ? "进入控制台" : "管理员登录" }}
-            </el-button>
-          </template>
+          <el-button
+            v-if="actionMenus.adminMenu"
+            type="primary"
+            @click="handleSelect(actionMenus.adminMenu.path)"
+          >
+            {{ getMenuName(actionMenus.adminMenu) }}
+          </el-button>
         </div>
       </div>
     </header>
@@ -199,9 +259,7 @@ const actionMenus = computed(() => {
     Arial, sans-serif;
   background-color: var(--el-bg-color-page);
   color: var(--el-text-color-primary);
-  transition:
-    background-color 0.3s,
-    color 0.3s;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .header {
@@ -211,9 +269,7 @@ const actionMenus = computed(() => {
   background-color: var(--el-bg-color-overlay);
   backdrop-filter: blur(10px);
   box-shadow: var(--el-box-shadow-light);
-  transition:
-    background-color 0.3s,
-    box-shadow 0.3s;
+  transition: background-color 0.3s, box-shadow 0.3s;
 
   .header-content {
     display: flex;

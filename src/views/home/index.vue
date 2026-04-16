@@ -1,30 +1,9 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { computed } from "vue";
-import { storageLocal } from "@pureadmin/utils";
-import { type DataInfo, userKey } from "@/utils/auth";
 import { getConfig } from "@/config";
 
 defineOptions({
   name: "Index"
 });
-
-const router = useRouter();
-
-// 检查是否已登录
-const isLogged = computed(() => {
-  const userInfo = storageLocal().getItem<DataInfo<number>>(userKey);
-  return !!userInfo;
-});
-
-// 跳转逻辑：如果已登录去控制台，未登录去登录页
-const goAdmin = () => {
-  if (isLogged.value) {
-    router.push("/admin/dashboard");
-  } else {
-    router.push("/admin/login");
-  }
-};
 </script>
 
 <template>
@@ -36,11 +15,6 @@ const goAdmin = () => {
         "这是一个高性能、响应式的企业级后台管理系统，提供稳定、安全的服务架构。"
       }}
     </p>
-    <div class="hero-actions">
-      <el-button type="primary" size="large" @click="goAdmin">
-        {{ isLogged ? "进入控制台" : "管理员登录" }}
-      </el-button>
-    </div>
   </div>
 </template>
 
@@ -66,9 +40,4 @@ const goAdmin = () => {
   transition: color 0.3s;
 }
 
-.hero-actions {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-}
 </style>

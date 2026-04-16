@@ -73,8 +73,6 @@ export const getPlatformConfig = async (app: App): Promise<undefined> => {
             formattedConfig["ContactEmail"] = backendConfig[key];
           } else if (key === "maintenance_mode") {
             formattedConfig["MaintenanceMode"] = backendConfig[key] === "1";
-          } else if (key === "hide_login_entrance") {
-            formattedConfig["HideLoginEntrance"] = backendConfig[key] === "1";
           }
         }
 
