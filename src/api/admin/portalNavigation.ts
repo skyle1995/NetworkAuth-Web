@@ -3,6 +3,8 @@ import { http } from "@/utils/http";
 export type PortalNavigationItem = {
   id: number;
   name: string;
+  type: "link" | "group";
+  parent_id: number;
   path: string;
   sort: number;
   is_home: boolean;
@@ -21,6 +23,8 @@ export type PortalNavigationResult = {
 export type PortalNavigationSavePayload = {
   id?: number;
   name: string;
+  type: "link" | "group";
+  parent_id: number;
   path: string;
   sort: number;
   is_home: boolean;

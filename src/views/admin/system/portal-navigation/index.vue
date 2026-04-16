@@ -29,6 +29,8 @@ let sortableInstance: Sortable | null = null;
 const form = reactive<PortalNavigationItem>({
   id: 0,
   name: "",
+  type: "link",
+  parent_id: 0,
   path: "",
   sort: 0,
   is_home: false,
@@ -38,8 +40,23 @@ const form = reactive<PortalNavigationItem>({
 
 const formRules: FormRules = {
   name: [{ required: true, message: "请输入导航名称", trigger: "blur" }],
-  path: [{ required: true, message: "请输入导航地址", trigger: "blur" }]
+  path: [
+    {
+      validator: (_rule, value, callback) => {
+        if (form.type === "link" && !String(value || "").trim()) {
+          callback(new Error("请输入导航地址"));
+          return;
+        }
+        callback();
+      },
+      trigger: "blur"
+    }
+  ]
 };
+
+const groupOptions = computed(() =>
+  tableData.value.filter(item => item.type === "group" && item.id !== form.id)
+);
 
 const dialogTitle = computed(() => {
   switch (dialogMode.value) {
@@ -57,6 +74,8 @@ const dialogTitle = computed(() => {
 const resetFormData = () => {
   form.id = 0;
   form.name = "";
+  form.type = "link";
+  form.parent_id = 0;
   form.path = "";
   form.sort = 0;
   form.is_home = false;
@@ -144,6 +163,8 @@ const handleEdit = (row: PortalNavigationItem) => {
   dialogMode.value = "edit";
   form.id = row.id;
   form.name = row.name;
+  form.type = row.type || "link";
+  form.parent_id = row.parent_id || 0;
   form.path = row.path;
   form.sort = row.sort;
   form.is_home = row.is_home;
@@ -162,6 +183,19 @@ const handleDialogClose = () => {
   resetFormData();
 };
 
+const handleTypeChange = () => {
+  switch (form.type) {
+    case "group":
+      form.parent_id = 0;
+      form.path = "";
+      form.is_external = false;
+      form.is_home = false;
+      break;
+    default:
+      break;
+  }
+};
+
 /**
  * 保存门户导航
  * 根据当前弹窗模式调用新增或编辑接口
@@ -177,6 +211,8 @@ const handleSubmit = async () => {
     const payload = {
       id: form.id,
       name: form.name,
+      type: form.type,
+      parent_id: form.type === "group" ? 0 : Number(form.parent_id || 0),
       path: form.path,
       sort:
         dialogMode.value === "create"
@@ -223,6 +259,8 @@ const saveRowState = async (row: PortalNavigationItem, successMessage: string) =
     const res = await updatePortalNavigation({
       id: row.id,
       name: row.name,
+      type: row.type,
+      parent_id: row.parent_id,
       path: row.path,
       sort: row.sort,
       is_home: row.is_home,
@@ -285,6 +323,19 @@ const handleExternalSwitch = async (row: PortalNavigationItem) => {
   await saveRowState(row, "打开方式已更新");
 };
 
+const getTypeLabel = (row: PortalNavigationItem) => {
+  return row.type === "group" ? "分组" : "链接";
+};
+
+const getParentGroupName = (row: PortalNavigationItem) => {
+  if (!row.parent_id) return "-";
+  return tableData.value.find(item => item.id === row.parent_id)?.name || "-";
+};
+
+const getDisplayName = (row: PortalNavigationItem) => {
+  return row.parent_id ? `└ ${row.name}` : row.name;
+};
+
 /**
  * 保存拖拽排序结果
  * 按当前表格顺序重新计算 sort 并逐条提交
@@ -335,6 +386,8 @@ const handleSortChange = async (oldIndex: number, newIndex: number) => {
       const res = await updatePortalNavigation({
         id: item.id,
         name: item.name,
+        type: item.type,
+        parent_id: item.parent_id,
         path: item.path,
         sort: item.sort,
         is_home: item.is_home,
@@ -426,6 +479,7 @@ onBeforeUnmount(() => {
             <div class="text-base font-bold">导航设置</div>
             <div class="text-xs text-gray-400 mt-1">
               支持配置名称、地址、排序和门户首页，管理员登录入口为系统保留项
+              分组将在门户首页中展示为下拉菜单
             </div>
           </div>
           <el-button type="primary" @click="handleCreate">新增导航</el-button>
@@ -444,8 +498,28 @@ onBeforeUnmount(() => {
           </template>
         </el-table-column>
         <el-table-column prop="sort" label="排序" min-width="90" align="center" />
-        <el-table-column prop="name" label="导航名称" min-width="160" />
-        <el-table-column prop="path" label="导航地址" min-width="260" show-overflow-tooltip />
+        <el-table-column label="类型" min-width="100" align="center">
+          <template #default="{ row }">
+            <el-tag size="small" :type="row.type === 'group' ? 'warning' : 'info'">
+              {{ getTypeLabel(row) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="导航名称" min-width="180">
+          <template #default="{ row }">
+            {{ getDisplayName(row) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="所属分组" min-width="140" align="center">
+          <template #default="{ row }">
+            {{ getParentGroupName(row) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="导航地址" min-width="260" show-overflow-tooltip>
+          <template #default="{ row }">
+            {{ row.type === "group" ? "-" : row.path }}
+          </template>
+        </el-table-column>
         <el-table-column label="隐藏" min-width="120" align="center">
           <template #default="{ row }">
             <el-switch
@@ -459,7 +533,7 @@ onBeforeUnmount(() => {
           <template #default="{ row }">
             <el-switch
               v-model="row.is_external"
-              :disabled="isLockedAdminEntry(row)"
+              :disabled="isLockedAdminEntry(row) || row.type === 'group'"
               @change="handleExternalSwitch(row)"
             />
           </template>
@@ -468,7 +542,7 @@ onBeforeUnmount(() => {
           <template #default="{ row }">
             <el-switch
               v-model="row.is_home"
-              :disabled="isLockedAdminEntry(row)"
+              :disabled="isLockedAdminEntry(row) || row.type === 'group' || row.parent_id > 0"
               @change="handleHomeSwitch(row)"
             />
           </template>
@@ -512,10 +586,27 @@ onBeforeUnmount(() => {
         label-width="110px"
         label-position="right"
       >
+        <el-form-item label="导航类型">
+          <el-radio-group v-model="form.type" @change="handleTypeChange">
+            <el-radio value="link">链接</el-radio>
+            <el-radio value="group">分组</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="导航名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入导航名称" />
         </el-form-item>
-        <el-form-item label="导航地址" prop="path">
+        <el-form-item v-if="form.type === 'link'" label="所属分组">
+          <el-select v-model="form.parent_id" placeholder="请选择所属分组，留空表示顶级链接" clearable class="w-full">
+            <el-option :value="0" label="顶级链接" />
+            <el-option
+              v-for="item in groupOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="form.type === 'link'" label="导航地址" prop="path">
           <el-input
             v-model="form.path"
             placeholder="请输入导航地址或路由路径，例如 /home/index"
@@ -523,7 +614,7 @@ onBeforeUnmount(() => {
         </el-form-item>
         <el-form-item>
           <div class="text-xs text-gray-400">
-            首页、隐藏、外部打开和排序请直接在表格中通过开关或拖拽进行调整
+            分组仅用于下拉展示，不支持首页与外部打开；首页、隐藏、外部打开和排序请直接在表格中调整
           </div>
         </el-form-item>
       </el-form>

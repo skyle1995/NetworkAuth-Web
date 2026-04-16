@@ -9,6 +9,7 @@ import {
   type PortalNavigationItem
 } from "@/api/admin/portalNavigation";
 import MenuIcon from "~icons/ri/menu-line";
+import { ArrowDown } from "@element-plus/icons-vue";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
 
 import dayIcon from "@/assets/svg/day.svg?component";
@@ -22,6 +23,10 @@ const router = useRouter();
 const route = useRoute();
 const navMenus = ref<PortalNavigationItem[]>([]);
 const adminMenu = ref<PortalNavigationItem | null>(null);
+
+type HomeMenuItem = PortalNavigationItem & {
+  children?: PortalNavigationItem[];
+};
 
 const { dataTheme, overallStyle, dataThemeChange } = useDataThemeChange();
 // 页面加载时根据本地存储初始化主题
@@ -95,6 +100,44 @@ const fetchPortalNavigationList = async () => {
   }
 };
 
+const topMenus = computed<HomeMenuItem[]>(() => {
+  const topLevelItems = navMenus.value
+    .filter(item => !item.parent_id)
+    .sort((a, b) => a.sort - b.sort || a.id - b.id);
+
+  return topLevelItems.map(item => {
+    if (item.type !== "group") {
+      return item;
+    }
+    return {
+      ...item,
+      children: navMenus.value
+        .filter(child => child.parent_id === item.id)
+        .sort((a, b) => a.sort - b.sort || a.id - b.id)
+    };
+  });
+});
+
+const mobileMenus = computed(() => {
+  return topMenus.value.flatMap(item => {
+    if (item.type !== "group") {
+      return [{ ...item, is_child: false, group_name: "" }];
+    }
+    const groupHeader = {
+      ...item,
+      is_child: false,
+      group_name: item.name,
+      is_group_header: true
+    };
+    const children = (item.children || []).map(child => ({
+      ...child,
+      is_child: true,
+      group_name: item.name
+    }));
+    return [groupHeader, ...children];
+  });
+});
+
 /**
  * 获取导航显示名称
  * 管理员入口在登录后统一展示为进入控制台
@@ -119,6 +162,10 @@ const isMenuActive = (menu: PortalNavigationItem) => {
     default:
       return activeMenu.value === menu.path;
   }
+};
+
+const isGroupActive = (menu: HomeMenuItem) => {
+  return (menu.children || []).some(child => isMenuActive(child));
 };
 
 onMounted(() => {
@@ -167,12 +214,17 @@ const actionMenus = computed(() => {
               <el-dropdown-menu>
                 <!-- 动态渲染中间菜单项 -->
                 <el-dropdown-item
-                  v-for="menu in navMenus"
-                  :key="menu.path"
-                  :command="menu.path"
-                  :style="isMenuActive(menu) ? 'color: var(--el-color-primary); background-color: var(--el-color-primary-light-9)' : ''"
+                  v-for="menu in mobileMenus"
+                  :key="menu.id"
+                  :command="menu.type === 'group' ? undefined : menu.path"
+                  :disabled="menu.type === 'group'"
+                  :style="menu.type === 'group'
+                    ? 'font-weight: 600; color: var(--el-text-color-primary)'
+                    : isMenuActive(menu)
+                      ? 'color: var(--el-color-primary); background-color: var(--el-color-primary-light-9)'
+                      : ''"
                 >
-                  {{ getMenuName(menu) }}
+                  {{ menu.is_child ? `  ${getMenuName(menu)}` : getMenuName(menu) }}
                 </el-dropdown-item>
 
                 <el-dropdown-item
@@ -189,22 +241,42 @@ const actionMenus = computed(() => {
 
         <!-- 桌面端中间导航菜单 -->
         <div class="nav-menu desktop-nav">
-          <el-menu
-            :default-active="activeMenu"
-            class="el-menu-home"
-            mode="horizontal"
-            :ellipsis="false"
-            @select="handleSelect"
-          >
-            <!-- 动态渲染中间菜单项 -->
-            <el-menu-item 
-              v-for="menu in navMenus" 
-              :key="menu.path" 
-              :index="menu.path"
-            >
-              {{ getMenuName(menu) }}
-            </el-menu-item>
-          </el-menu>
+          <div class="desktop-menu-list">
+            <template v-for="menu in topMenus" :key="menu.id">
+              <el-dropdown
+                v-if="menu.type === 'group'"
+                trigger="hover"
+                placement="bottom"
+                popper-class="home-nav-dropdown"
+                @command="handleSelect"
+              >
+                <div class="nav-item nav-group" :class="{ 'is-active': isGroupActive(menu) }">
+                  <span>{{ getMenuName(menu) }}</span>
+                  <el-icon class="nav-group-arrow"><ArrowDown /></el-icon>
+                </div>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item
+                      v-for="child in menu.children || []"
+                      :key="child.id"
+                      :command="child.path"
+                      :class="{ 'is-active': isMenuActive(child) }"
+                    >
+                      {{ getMenuName(child) }}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+              <div
+                v-else
+                class="nav-item"
+                :class="{ 'is-active': isMenuActive(menu) }"
+                @click="handleSelect(menu.path)"
+              >
+                {{ getMenuName(menu) }}
+              </div>
+            </template>
+          </div>
         </div>
 
         <!-- 右侧操作 -->
@@ -314,31 +386,72 @@ const actionMenus = computed(() => {
   display: flex;
   justify-content: flex-start;
   margin-left: 20px;
+}
 
-  :deep(.el-menu-home) {
-    background-color: transparent;
-    border-bottom: none;
+.desktop-menu-list {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
 
-    .el-menu-item {
-      height: 64px;
-      line-height: 64px;
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--el-text-color-regular);
-      border-bottom: 2px solid transparent;
+.nav-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 18px;
+  color: var(--el-text-color-regular);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 
-      &:hover {
-        color: var(--el-color-primary);
-        background-color: transparent;
-      }
+  &::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 0;
+    height: 2px;
+    border-radius: 999px;
+    background: transparent;
+    transition: background-color 0.2s ease;
+  }
 
-      &.is-active {
-        color: var(--el-color-primary);
-        border-bottom-color: var(--el-color-primary);
-        background-color: transparent !important;
-      }
+  &:hover {
+    color: var(--el-color-primary);
+  }
+
+  &.is-active {
+    color: var(--el-color-primary);
+
+    &::after {
+      background: var(--el-color-primary);
     }
   }
+}
+
+.nav-group {
+  gap: 4px;
+}
+
+.nav-group-arrow {
+  font-size: 12px;
+  color: currentColor;
+  transform: translateY(1px);
+}
+
+:deep(.el-dropdown-menu__item) {
+  min-width: 120px;
+}
+
+:global(.home-nav-dropdown .el-dropdown-menu__item.is-active) {
+  color: var(--el-color-primary);
+  background-color: var(--el-color-primary-light-9);
+  font-weight: 600;
 }
 
 .actions {
